@@ -6,10 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { authClient } from "../../../../lib/auth-client";
+import { useRouter } from "next/navigation";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 import Link from "next/link";
 
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertTitle } from "@/components/ui/alert";
@@ -22,21 +23,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-const formSchema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  email: z.string().email(),
-  password: z.string().min(1, { message: "Password is required" }),
-  confirmPassword: z.string().min(1, { message: "Password is required" }),
-})
-.refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"]
-});
+const formSchema = z
+  .object({
+    name: z.string().min(1, { message: "Name is required" }),
+    email: z.string().email(),
+    password: z.string().min(1, { message: "Password is required" }),
+    confirmPassword: z.string().min(1, { message: "Password is required" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 export const SignUpView = () => {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,14 +59,15 @@ export const SignUpView = () => {
         name: data.name,
         email: data.email,
         password: data.password,
+        callbackURL: "/",
       },
       {
         onSuccess: () => {
-            setPending(false);
+          setPending(false);
           router.push("/");
         },
         onError: ({ error }) => {
-            setPending(false);
+          setPending(false);
           setError(error.message);
         },
       }
@@ -95,11 +98,7 @@ export const SignUpView = () => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="John Doe"
-                        {...field}
-                      />
+                      <Input type="text" placeholder="John Doe" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -180,12 +179,32 @@ export const SignUpView = () => {
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Button disabled={pending} variant="outline" type="button" className="w-full">
-                  Google
+                <Button
+                  disabled={pending}
+                  onClick={() => {
+                    authClient.signIn.social({
+                      provider: "google",
+                    });
+                  }}
+                  variant="outline"
+                  type="button"
+                  className="w-full"
+                >
+                  <FaGoogle />
                 </Button>
 
-                <Button disabled={pending} variant="outline" type="button" className="w-full">
-                  Github
+                <Button
+                  disabled={pending}
+                  onClick={() => {
+                    authClient.signIn.social({
+                      provider: "github",
+                    });
+                  }}
+                  variant="outline"
+                  type="button"
+                  className="w-full"
+                >
+                  <FaGithub />
                 </Button>
               </div>
 

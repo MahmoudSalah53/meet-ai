@@ -134,10 +134,15 @@ export const SignInView = () => {
               <div className="grid grid-cols-2 gap-4">
                 <Button
                   disabled={pending}
-                  onClick={() => {
-                    authClient.signIn.social({
-                      provider: "google",
-                    });
+                  onClick={async () => {
+                    setPending(true);
+                    try {
+                      await authClient.signIn.social({ provider: "google" });
+                    } catch (error) {
+                      console.error(error);
+                    } finally {
+                      setPending(false);
+                    }
                   }}
                   variant="outline"
                   type="button"
@@ -148,10 +153,15 @@ export const SignInView = () => {
 
                 <Button
                   disabled={pending}
-                  onClick={() => {
-                    authClient.signIn.social({
-                      provider: "github",
-                    });
+                  onClick={async () => {
+                    setPending(true);
+                    try {
+                      await authClient.signIn.social({ provider: "github" });
+                    } catch (error) {
+                      console.error(error);
+                    } finally {
+                      setPending(false);
+                    }
                   }}
                   variant="outline"
                   type="button"
@@ -171,7 +181,7 @@ export const SignInView = () => {
           </Form>
 
           <div
-            className="bg-radial from-green-700 to-green-900 relative hidden md:flex flex-col
+            className="bg-radial from-sidebar-accent to-sidebar relative hidden md:flex flex-col
             gap-y-4 items-center justify-center"
           >
             <img src="/logo.svg" alt="Image" className="h-[92px] w-[92px]" />
